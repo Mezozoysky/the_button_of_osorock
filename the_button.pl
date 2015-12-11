@@ -99,17 +99,26 @@ sub generateTopNReport
     }
 
     my @freqs = sort { $b <=> $a } keys( %wordsByFreq );
-    for ( my $i = 0; $i <= $#freqs and $i < $N; ++$i )
+    debugWarn( "--- DBG: top$N report: freqs num = " . ( $#freqs + 1 ) . "\n" );
+    if ( $N > $#freqs + 1 and $strictOption )
     {
-        my $freq = $freqs[ $i ];
-        my $arrayRef = $wordsByFreq{$freq};
-        for my $word ( @$arrayRef )
+        $report = "Мало частот для строгого top:$N";
+    }
+    else
+    {
+        $report = "Суть в нескольких словах:";
+        for ( my $i = 0; $i <= $#freqs and $i < $N; ++$i )
         {
-            $report .= " $word";
+            my $freq = $freqs[ $i ];
+            my $arrayRef = $wordsByFreq{$freq};
+            for my $word ( @$arrayRef )
+            {
+                $report .= " $word";
+            }
         }
     }
 
-    return trim( $report );
+    return trim( $report ). "\n";
 }
 
 sub generateReport
@@ -120,6 +129,11 @@ sub generateReport
     {
         debugWarn( "--- DBG: generating report of type \"top:N\" :: \"$reportTypeOption:$reportTypeOption_1\"\n" );
         $report = generateTopNReport( $reportTypeOption_1 );
+    }
+    else
+    {
+        debugWarn( "--- ERROR: report type \"$reportTypeOption\" is not implemented. Force using \"top:1\"" );
+        $report = generateTopNReport( 1 );
     }
 
     return $report;
@@ -246,4 +260,4 @@ if ( $debugOption )
 
 my $report = generateReport();
 debugWarn( "---\n" );
-print( "$report\n" );
+print( "$report" );
