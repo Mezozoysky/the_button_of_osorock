@@ -28,31 +28,16 @@ use strict;
 use warnings;
 
 use File::Basename;
-use Cwd 'abs_path';
+use Cwd;
+use TBUtils 'debugWarn';
+use TBTopN;
 
 our $debugOption = 0; # set this to 1 for enable debug output. 0 by default ( on should use --debug option )
 our $strictOption = 0; # set this to 1 strict report generating. 0 otherwise
 our $reportTypeOption = "top"; # where is only one type presented for now
-our $reportTypeOption_1 = 1;
+our $reportTypeOption_1 = 1; # should i use array for report type params?
 
 our %dictionary = ();
-
-sub trim
-{
-    my $s = shift;
-    $s =~ s/^\s+|\s+$//g;
-    return $s;
-};
-
-sub debugWarn
-{
-    my $str = shift;
-
-    if ( $debugOption > 0 )
-    {
-        warn( $str );
-    }
-}
 
 sub filterWord
 {
@@ -77,50 +62,6 @@ sub processWord
     debugWarn( "--- DBG: \"$word\" processed. result is \"$filteredWord\"\n" );
 }
 
-sub generateTopNReport
-{
-    my $N = shift;
-
-    my $report = "";
-    my %wordsByFreq = ();
-    for my $word ( keys( %dictionary ) )
-    {
-        my $freq = $dictionary{ $word };
-        if ( not exists( $wordsByFreq{ $freq } ) )
-        {
-            my @words = ( $word );
-            $wordsByFreq{ $freq } = \@words;
-        }
-        else
-        {
-            my $arrayRef = $wordsByFreq{ $freq };
-            push( @$arrayRef, $word );
-        }
-    }
-
-    my @freqs = sort { $b <=> $a } keys( %wordsByFreq );
-    debugWarn( "--- DBG: top$N report: freqs num = " . ( $#freqs + 1 ) . "\n" );
-    if ( $N > $#freqs + 1 and $strictOption )
-    {
-        $report = "Мало частот для строгого top:$N";
-    }
-    else
-    {
-        $report = "Суть в нескольких словах:";
-        for ( my $i = 0; $i <= $#freqs and $i < $N; ++$i )
-        {
-            my $freq = $freqs[ $i ];
-            my $arrayRef = $wordsByFreq{$freq};
-            for my $word ( @$arrayRef )
-            {
-                $report .= " $word";
-            }
-        }
-    }
-
-    return trim( $report ). "\n";
-}
-
 sub generateReport
 {
     my $report = "";
@@ -128,12 +69,12 @@ sub generateReport
     if ( $reportTypeOption eq "top" )
     {
         debugWarn( "--- DBG: generating report of type \"top:N\" :: \"$reportTypeOption:$reportTypeOption_1\"\n" );
-        $report = generateTopNReport( $reportTypeOption_1 );
+        $report = TBTopN::generateReport( $reportTypeOption_1, \%dictionary );
     }
     else
     {
         debugWarn( "--- ERROR: report type \"$reportTypeOption\" is not implemented. Force using \"top:1\"" );
-        $report = generateTopNReport( 1 );
+        $report = TBTopN::generateReport( 1, \%dictionary );
     }
 
     return $report;
@@ -159,7 +100,7 @@ sub printHelp
 debugWarn( "\n--- INFO: Starting " . basename( $0 ) . "\n\n" );
 my $numArgs = $#ARGV + 1;
 debugWarn( "--- INFO: Arguments: $numArgs\n");
-my $baseDir = abs_path( "." );
+my $baseDir = Cwd::abs_path( "." );
 debugWarn( "--- INFO: Working dir: $baseDir\n" );
 debugWarn( "\n");
 
