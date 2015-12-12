@@ -2,10 +2,11 @@
 The Button of Osorock.
 
 ```
+bash-3.2$ ./TheButton.pl --help
 Usage:
-./the_button.pl --help
+./TheButton.pl --help
 	Prints current help screen
-./the_button.pl [--report-type type] [--debug] [--strict]
+./TheButton.pl [--report-type type] [--debug] [--strict]
 	--report-type	defines the report type
 		Valid types are:
 			top:<N> (<N> is a number of top positions will be reported)

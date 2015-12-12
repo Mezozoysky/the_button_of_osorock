@@ -24,13 +24,16 @@
 # 3.  This notice may not be removed or altered from any
 #     source distribution.
 
+package main;
+
 use strict;
 use warnings;
 
-use File::Basename;
+use File::Basename 'basename';
 use Cwd;
 use TBUtils 'debugWarn';
 use TBTopN;
+
 
 our $debugOption = 0; # set this to 1 for enable debug output. 0 by default ( on should use --debug option )
 our $strictOption = 0; # set this to 1 strict report generating. 0 otherwise
@@ -97,12 +100,8 @@ sub printHelp
 #
 # main
 #
-debugWarn( "\n--- INFO: Starting " . basename( $0 ) . "\n\n" );
 my $numArgs = $#ARGV + 1;
-debugWarn( "--- INFO: Arguments: $numArgs\n");
 my $baseDir = Cwd::abs_path( "." );
-debugWarn( "--- INFO: Working dir: $baseDir\n" );
-debugWarn( "\n");
 
 if ( $numArgs >= 1 )
 {
@@ -183,7 +182,6 @@ debugWarn( "--- INFO:\treport type arg1: \"$reportTypeOption_1\"\n" );
 while ( <STDIN> )
 {
     # print( "$. $_" );
-    # my $line = $_;
     for my $word ( split( /\s+/, $_ ) )
     {
         processWord( $word );
