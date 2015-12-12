@@ -51,13 +51,13 @@ sub processWord
 {
     my $word = shift;
     my $filteredWord = filterWord( $word );
-    if ( not exists( $dictionary{ $word } ) )
+    if ( not exists( $dictionary{ $filteredWord } ) )
     {
-        $dictionary{ $word } = 1;
+        $dictionary{ $filteredWord } = 1;
     }
     else
     {
-        $dictionary{ $word }++;
+        $dictionary{ $filteredWord }++;
     }
     debugWarn( "--- DBG: \"$word\" processed. result is \"$filteredWord\"\n" );
 }
