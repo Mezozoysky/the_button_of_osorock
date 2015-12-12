@@ -205,7 +205,7 @@ if ( $numArgs >= 1 )
                                     };
             if ( $arg =~ m/^(top):(\d+)$/ )
             {
-                debugWarn( "--- DBG: report type is 'top:$1'\n" );
+                debugWarn( "--- DBG: report type is 'top:$2'\n" );
                 $reportTypeOption = $1;
                 $reportTypeOption_1 = $2;
             }
