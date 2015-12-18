@@ -40,8 +40,6 @@ our $strictOption = 0; # set this to 1 strict report generating. 0 otherwise
 our $reportTypeOption = "top"; # where is only one type presented for now
 our $reportTypeOption_1 = 1; # should i use array for report type params?
 
-our %dictionary = ();
-
 sub filterWord
 {
     my $word = shift;
@@ -53,31 +51,33 @@ sub filterWord
 sub processWord
 {
     my $word = shift;
+    my $dictRef = shift;
     my $filteredWord = filterWord( $word );
-    if ( not exists( $dictionary{ $filteredWord } ) )
+    if ( not exists( $dictRef->{ $filteredWord } ) )
     {
-        $dictionary{ $filteredWord } = 1;
+        $dictRef->{ $filteredWord } = 1;
     }
     else
     {
-        $dictionary{ $filteredWord }++;
+        $dictRef->{ $filteredWord }++;
     }
     debugWarn( "--- DBG: \"$word\" processed. result is \"$filteredWord\"\n" );
 }
 
 sub generateReport
 {
+    my $dictRef = shift;
     my $report = "";
 
     if ( $reportTypeOption eq "top" )
     {
         debugWarn( "--- DBG: generating report of type \"top:N\" :: \"$reportTypeOption:$reportTypeOption_1\"\n" );
-        $report = TBTopN::generateReport( $reportTypeOption_1, \%dictionary );
+        $report = TBTopN::generateReport( $reportTypeOption_1, $dictRef );
     }
     else
     {
         debugWarn( "--- ERROR: report type \"$reportTypeOption\" is not implemented. Force using \"top:1\"" );
-        $report = TBTopN::generateReport( 1, \%dictionary );
+        $report = TBTopN::generateReport( 1, $dictRef );
     }
 
     return $report;
@@ -179,12 +179,14 @@ debugWarn( "--- INFO:\tstrict: \"$strictOption\"\n" );
 debugWarn( "--- INFO:\treport type: \"$reportTypeOption\"\n" );
 debugWarn( "--- INFO:\treport type arg1: \"$reportTypeOption_1\"\n" );
 
+my %dictionary = ();
+
 while ( <STDIN> )
 {
     # print( "$. $_" );
     for my $word ( split( /\s+/, $_ ) )
     {
-        processWord( $word );
+        processWord( $word, \%dictionary );
     }
 }
 
@@ -197,6 +199,6 @@ if ( $debugOption )
     }
 }
 
-my $report = generateReport();
+my $report = generateReport( \%dictionary );
 debugWarn( "---\n" );
-print( "$report" );
+print( $report );
