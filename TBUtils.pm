@@ -33,12 +33,24 @@ use vars qw( @ISA @EXPORT );
 @ISA = qw(Exporter);
 @EXPORT = ( "trim", "debugWarn" );
 
-sub trim
+
+
+sub trim # trim( $string ) removes whitespace on both ends of $string
 {
     my $s = shift;
     $s =~ s/^\s+|\s+$//g;
     return $s;
 };
+
+sub getNthChar # getNthChar( $string, $n ) gets $n-th char from $string
+{
+    my $s = shift;
+    my $n = shift;
+
+    my $c = substr( $s, $n, 1 );
+
+    return $c;
+}
 
 sub debugWarn
 {
