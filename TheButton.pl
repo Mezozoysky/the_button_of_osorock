@@ -32,6 +32,7 @@ use warnings;
 use File::Basename 'basename';
 use Cwd;
 use TBUtils 'debugWarn';
+use TBParser;
 use TBTopN;
 
 
@@ -39,30 +40,6 @@ our $debugOption = 0; # set this to 1 for enable debug output. 0 by default ( on
 our $strictOption = 0; # set this to 1 strict report generating. 0 otherwise
 our $reportTypeOption = "top"; # where is only one type presented for now
 our $reportTypeOption_1 = 1; # should i use array for report type params?
-
-sub filterWord
-{
-    my $word = shift;
-    # Do nothing with $word for now
-    # But we'll can do anything with it here in future
-    return $word;
-}
-
-sub processWord
-{
-    my $word = shift;
-    my $dictRef = shift;
-    my $filteredWord = filterWord( $word );
-    if ( not exists( $dictRef->{ $filteredWord } ) )
-    {
-        $dictRef->{ $filteredWord } = 1;
-    }
-    else
-    {
-        $dictRef->{ $filteredWord }++;
-    }
-    debugWarn( "--- DBG: \"$word\" processed. result is \"$filteredWord\"\n" );
-}
 
 sub generateReport
 {
@@ -180,15 +157,12 @@ debugWarn( "--- INFO:\treport type: \"$reportTypeOption\"\n" );
 debugWarn( "--- INFO:\treport type arg1: \"$reportTypeOption_1\"\n" );
 
 my %dictionary = ();
-
+my $parser = TBParser->new( dictRef => \%dictionary );
 while ( <STDIN> )
 {
-    # print( "$. $_" );
-    for my $word ( split( /\s+/, $_ ) )
-    {
-        processWord( $word, \%dictionary );
-    }
+    $parser->parseLine( $_, $. );
 }
+
 
 debugWarn( "--- DBG: Dictionary:\n" );
 if ( $debugOption )
